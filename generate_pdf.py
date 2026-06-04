@@ -69,6 +69,42 @@ def create_invoice(filename, details):
     ))
     
     styles.add(ParagraphStyle(
+        name='InvoiceTitleCentered',
+        fontName='Helvetica-Bold',
+        fontSize=24,
+        leading=28,
+        textColor=c_accent,
+        alignment=1 # Center align
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='HeaderBrandCentered',
+        fontName='Helvetica-Bold',
+        fontSize=15,
+        leading=19,
+        textColor=c_primary,
+        alignment=1 # Center align
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='HeaderBrandSubCentered',
+        fontName='Helvetica',
+        fontSize=9,
+        leading=13,
+        textColor=c_text_muted,
+        alignment=1 # Center align
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='MetaBarCell',
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=c_text_dark,
+        alignment=1 # Center align
+    ))
+    
+    styles.add(ParagraphStyle(
         name='HeaderBrand',
         fontName='Helvetica-Bold',
         fontSize=20,
@@ -179,66 +215,43 @@ def create_invoice(filename, details):
         alignment=2
     ))
 
-    # --- Header Table ---
-    # Left: Brand, Right: Invoice Title & Meta
-    brand_p = Paragraph("GORAN AI", styles['HeaderBrand'])
-    brand_sub_p = Paragraph("Advanced AI Agents & Web Solutions<br/>Email: official.goranai@gmail.com<br/>Website: https://goran.in", styles['HeaderBrandSub'])
+    # --- Header (Centered Layout) ---
+    title_p = Paragraph("INVOICE", styles['InvoiceTitleCentered'])
+    brand_p = Paragraph("GORAN AI", styles['HeaderBrandCentered'])
+    brand_sub_p = Paragraph("official.goranai@gmail.com | https://goran.in", styles['HeaderBrandSubCentered'])
     
-    brand_flow = [brand_p, Spacer(1, 4), brand_sub_p]
+    story.append(title_p)
+    story.append(Spacer(1, 6))
+    story.append(brand_p)
+    story.append(Spacer(1, 4))
+    story.append(brand_sub_p)
+    story.append(Spacer(1, 12))
     
-    meta_data = [
-        [Paragraph("INVOICE", styles['InvoiceTitle']), ""],
-        [Paragraph("Invoice Number:", styles['MetaLabel']), Paragraph(details['invoice_no'], styles['MetaVal'])],
-        [Paragraph("Date:", styles['MetaLabel']), Paragraph(details['date'], styles['MetaVal'])],
-        [Paragraph("Due Date:", styles['MetaLabel']), Paragraph(details['due_date'], styles['MetaVal'])],
-    ]
-    
-    meta_table = Table(meta_data, colWidths=[110, 90])
-    meta_table.setStyle(TableStyle([
-        ('SPAN', (0, 0), (1, 0)),
-        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+    # --- Metadata Bar (Horizontal Table) ---
+    meta_bar_data = [[
+        Paragraph(f"<b>Invoice No:</b> {details['invoice_no']}", styles['MetaBarCell']),
+        Paragraph(f"<b>Date:</b> {details['date']}", styles['MetaBarCell']),
+        Paragraph(f"<b>Due Date:</b> {details['due_date']}", styles['MetaBarCell'])
+    ]]
+    meta_bar_table = Table(meta_bar_data, colWidths=[171, 172, 172]) # 515 total width
+    meta_bar_table.setStyle(TableStyle([
+        ('LINEABOVE', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('LINEBELOW', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
-        ('TOPPADDING', (0, 0), (-1, -1), 1),
     ]))
+    story.append(meta_bar_table)
+    story.append(Spacer(1, 20))
     
-    header_table = Table([[brand_flow, meta_table]], colWidths=[315, 200])
-    header_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-        ('TOPPADDING', (0, 0), (-1, -1), 0),
-    ]))
-    
-    story.append(header_table)
-    story.append(Spacer(1, 25))
-    
-    # --- Client / Bill To and Payment Summary ---
-    client_flow = [
-        Paragraph("BILLED TO", styles['SectionHeader']),
-        Paragraph(details['client_name'], styles['BodyBold']),
-        Paragraph(details['project_name'], styles['BodyNormal']),
-        Paragraph(details.get('client_address', ''), styles['BodyNormal'])
-    ]
-    
-    payment_method_flow = [
-        Paragraph("PAYMENT INFORMATION", styles['SectionHeader']),
-        Paragraph("Bank Transfer / UPI", styles['BodyBold']),
-        Paragraph(f"Bank: {details['bank_name']}", styles['BodyNormal']),
-        Paragraph(f"UPI ID: {details['upi_id']}", styles['BodyNormal']),
-    ]
-    
-    parties_table = Table([[client_flow, payment_method_flow]], colWidths=[260, 255])
-    parties_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
-        ('TOPPADDING', (0, 0), (-1, -1), 0),
-    ]))
-    
-    story.append(parties_table)
+    # --- Client / Bill To ---
+    story.append(Paragraph("BILLED TO", styles['SectionHeader']))
+    story.append(Paragraph(details['client_name'], styles['BodyBold']))
+    story.append(Paragraph(details['project_name'], styles['BodyNormal']))
+    if details.get('client_address'):
+        for line in details['client_address'].split('\n'):
+            if line.strip():
+                story.append(Paragraph(line, styles['BodyNormal']))
     story.append(Spacer(1, 20))
     
     # --- Line Items Table ---
