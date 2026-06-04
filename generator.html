@@ -626,6 +626,15 @@
 
             <!-- TAB: INVOICE FIELDS -->
             <div id="tab-invoice-fields" class="tab-content">
+                <div class="section-title">Invoice Branding</div>
+                <div class="form-group">
+                    <label for="logo-file">Upload Logo Image</label>
+                    <input type="file" id="logo-file" class="form-control" accept="image/*" onchange="handleLogoUpload(event)">
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">
+                        Choose an image (PNG, JPG, SVG) to replace the default logo.
+                    </p>
+                </div>
+
                 <div class="section-title">Invoice Meta</div>
                 <div class="form-row">
                     <div class="form-group">
@@ -758,20 +767,26 @@ official.goranai@gmail.com | https://goran.in</textarea>
             <div class="invoice-paper" id="invoice-printable">
                 <div>
                     <!-- Header -->
-                    <div class="invoice-header" style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 1.5rem; border: none;">
-                        <div class="invoice-title-area" style="text-align: center; margin-bottom: 0.25rem; width: 100%;">
-                            <h3 style="font-size: 2.25rem; font-weight: 800; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase;">INVOICE</h3>
-                        </div>
-                        <div class="invoice-logo-area" style="text-align: center; margin-bottom: 0.75rem;">
-                            <h2 id="p-company-name" style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 0.15rem;">GORAN AI</h2>
-                            <p id="p-company-details" style="white-space: pre-line; font-size: 0.85rem; color: var(--text-muted);">official.goranai@gmail.com | https://goran.in</p>
+                    <div class="invoice-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border: none; padding-bottom: 0;">
+                        <!-- Logo & Company Info on Left -->
+                        <div class="invoice-logo-area" style="text-align: left; display: flex; flex-direction: column; gap: 0.35rem;">
+                            <img id="p-logo" src="https://goran.in/GoRanLogo.png" alt="GORAN AI" style="max-height: 45px; max-width: 180px; object-fit: contain; display: block;" onerror="this.style.display='none'; document.getElementById('p-logo-placeholder').style.display='block';">
+                            <div id="p-logo-placeholder" style="display: none; font-size: 1.5rem; font-weight: 800; color: #0f172a;">GORAN AI</div>
+                            <p id="p-company-details" style="white-space: pre-line; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">official.goranai@gmail.com | https://goran.in</p>
                         </div>
                         
-                        <!-- Metadata Bar (Horizontal Layout) -->
-                        <div class="invoice-meta-bar" style="display: flex; justify-content: center; gap: 4rem; width: 100%; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 0; margin-top: 0.25rem; font-size: 0.85rem;">
-                            <div><span style="font-weight: 700; color: var(--text-muted);">Invoice No:</span> <span id="p-inv-no" style="font-weight: 600; color: #0f172a; margin-left: 0.25rem;">INV-001</span></div>
-                            <div><span style="font-weight: 700; color: var(--text-muted);">Date:</span> <span id="p-inv-date" style="font-weight: 600; color: #0f172a; margin-left: 0.25rem;">04 Jun 2026</span></div>
-                            <div><span style="font-weight: 700; color: var(--text-muted);">Due Date:</span> <span id="p-inv-due" style="font-weight: 600; color: #0f172a; margin-left: 0.25rem;">18 Jun 2026</span></div>
+                        <!-- Invoice Title & Meta on Right -->
+                        <div class="invoice-title-area" style="text-align: right; display: flex; flex-direction: column; gap: 0.2rem;">
+                            <h3 style="font-size: 2.25rem; font-weight: 800; color: var(--accent); letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 0;">INVOICE</h3>
+                            <div style="font-size: 1.2rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.25rem;">
+                                # <span id="p-inv-no">INV-001</span>
+                            </div>
+                            <div class="invoice-meta-info" style="display: grid; grid-template-columns: auto auto; gap: 0.2rem 0.5rem; font-size: 0.8rem; justify-content: right; text-align: right;">
+                                <span class="label" style="font-weight: 600; color: var(--text-muted);">Date:</span>
+                                <span class="val" id="p-inv-date" style="font-weight: 500; color: #0f172a;">04 Jun 2026</span>
+                                <span class="label" style="font-weight: 600; color: var(--text-muted);">Due Date:</span>
+                                <span class="val" id="p-inv-due" style="font-weight: 500; color: #0f172a;">18 Jun 2026</span>
+                            </div>
                         </div>
                     </div>
 
@@ -851,8 +866,42 @@ official.goranai@gmail.com | https://goran.in</textarea>
 
         function init() {
             renderItemInputs();
+            
+            // Load saved logo if any
+            const savedLogo = localStorage.getItem('goran_invoice_logo');
+            if (savedLogo) {
+                const logoEl = document.getElementById('p-logo');
+                if (logoEl) {
+                    logoEl.src = savedLogo;
+                    logoEl.style.display = 'block';
+                    const placeholderEl = document.getElementById('p-logo-placeholder');
+                    if (placeholderEl) placeholderEl.style.display = 'none';
+                }
+            }
+            
             updateInvoice();
             renderLedger();
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    const logoEl = document.getElementById('p-logo');
+                    if (logoEl) {
+                        logoEl.src = dataUrl;
+                        logoEl.style.display = 'block';
+                    }
+                    const placeholderEl = document.getElementById('p-logo-placeholder');
+                    if (placeholderEl) {
+                        placeholderEl.style.display = 'none';
+                    }
+                    localStorage.setItem('goran_invoice_logo', dataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         // Active Tabs control

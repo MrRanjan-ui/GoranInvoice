@@ -1,7 +1,7 @@
 import os
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 
@@ -139,6 +139,15 @@ def create_invoice(filename, details):
     ))
 
     styles.add(ParagraphStyle(
+        name='MetaValLarge',
+        fontName='Helvetica-Bold',
+        fontSize=12,
+        leading=15,
+        textColor=c_text_muted,
+        alignment=2 # Right align
+    ))
+
+    styles.add(ParagraphStyle(
         name='SectionHeader',
         fontName='Helvetica-Bold',
         fontSize=10,
@@ -215,33 +224,43 @@ def create_invoice(filename, details):
         alignment=2
     ))
 
-    # --- Header (Centered Layout) ---
-    title_p = Paragraph("INVOICE", styles['InvoiceTitleCentered'])
-    brand_p = Paragraph("GORAN AI", styles['HeaderBrandCentered'])
-    brand_sub_p = Paragraph("official.goranai@gmail.com | https://goran.in", styles['HeaderBrandSubCentered'])
+    # --- Header (Side-by-Side Logo Layout) ---
+    logo_path = details.get('logo_path', 'logo.png')
+    if os.path.exists(logo_path):
+        logo_flowable = Image(logo_path, width=130, height=40, kind='proportional')
+        logo_flow = [logo_flowable, Spacer(1, 4), Paragraph("official.goranai@gmail.com | https://goran.in", styles['HeaderBrandSub'])]
+    else:
+        logo_title = Paragraph("GORAN AI", styles['HeaderBrand'])
+        logo_sub = Paragraph("official.goranai@gmail.com | https://goran.in", styles['HeaderBrandSub'])
+        logo_flow = [logo_title, Spacer(1, 4), logo_sub]
+        
+    meta_flow = [
+        Paragraph("INVOICE", styles['InvoiceTitle']),
+        Paragraph(f"# {details['invoice_no']}", styles['MetaValLarge']),
+        Spacer(1, 4),
+        Table([
+            [Paragraph("Date:", styles['MetaLabel']), Paragraph(details['date'], styles['MetaVal'])],
+            [Paragraph("Due Date:", styles['MetaLabel']), Paragraph(details['due_date'], styles['MetaVal'])],
+        ], colWidths=[65, 85], style=[
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),
+            ('TOPPADDING', (0, 0), (-1, -1), 1),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ])
+    ]
     
-    story.append(title_p)
-    story.append(Spacer(1, 6))
-    story.append(brand_p)
-    story.append(Spacer(1, 4))
-    story.append(brand_sub_p)
-    story.append(Spacer(1, 12))
-    
-    # --- Metadata Bar (Horizontal Table) ---
-    meta_bar_data = [[
-        Paragraph(f"<b>Invoice No:</b> {details['invoice_no']}", styles['MetaBarCell']),
-        Paragraph(f"<b>Date:</b> {details['date']}", styles['MetaBarCell']),
-        Paragraph(f"<b>Due Date:</b> {details['due_date']}", styles['MetaBarCell'])
-    ]]
-    meta_bar_table = Table(meta_bar_data, colWidths=[171, 172, 172]) # 515 total width
-    meta_bar_table.setStyle(TableStyle([
-        ('LINEABOVE', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('LINEBELOW', (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    header_table = Table([[logo_flow, meta_flow]], colWidths=[335, 180])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
     ]))
-    story.append(meta_bar_table)
+    
+    story.append(header_table)
     story.append(Spacer(1, 20))
     
     # --- Client / Bill To ---
