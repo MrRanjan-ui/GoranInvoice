@@ -556,12 +556,16 @@
 
         /* Print Media CSS styling */
         @media print {
-            body {
+            body, html {
                 background-color: white !important;
                 color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+                overflow: visible !important;
             }
 
-            .controls-panel, header, .preview-panel {
+            header, .controls-panel {
                 display: none !important;
             }
 
@@ -569,20 +573,26 @@
                 display: block !important;
                 height: auto !important;
                 overflow: visible !important;
+                width: 100% !important;
             }
 
             .preview-panel {
                 padding: 0 !important;
                 background-color: transparent !important;
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
             }
 
             .invoice-paper {
                 box-shadow: none !important;
-                padding: 0 !important;
+                border: none !important;
+                padding: 10mm !important;
                 width: 100% !important;
                 height: auto !important;
                 min-height: auto !important;
-                border: none !important;
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -668,25 +678,25 @@
                 <div class="form-group">
                     <label for="company-details">Company Header Details</label>
                     <textarea id="company-details" class="form-control" style="height: 60px;" oninput="updateInvoice()">GORAN AI
-info@goran.in | https://goran.in</textarea>
+official.goranai@gmail.com | https://goran.in</textarea>
                 </div>
                 <div class="form-group">
                     <label for="bank-name">Bank Name</label>
-                    <input type="text" id="bank-name" class="form-control" value="HDFC Bank" oninput="updateInvoice()">
+                    <input type="text" id="bank-name" class="form-control" value="State Bank of India" oninput="updateInvoice()">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="bank-ac">Account Number</label>
-                        <input type="text" id="bank-ac" class="form-control" value="50200012345678" oninput="updateInvoice()">
+                        <input type="text" id="bank-ac" class="form-control" value="42002389558" oninput="updateInvoice()">
                     </div>
                     <div class="form-group">
                         <label for="bank-ifsc">IFSC Code</label>
-                        <input type="text" id="bank-ifsc" class="form-control" value="HDFC0001234" oninput="updateInvoice()">
+                        <input type="text" id="bank-ifsc" class="form-control" value="SBIN0002911" oninput="updateInvoice()">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="bank-upi">UPI Address</label>
-                    <input type="text" id="bank-upi" class="form-control" value="goranai@upi" oninput="updateInvoice()">
+                    <input type="text" id="bank-upi" class="form-control" value="ranjanashish9992@ybl" oninput="updateInvoice()">
                 </div>
                 <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="saveInvoiceToLedger()">Save Invoice to Ledger</button>
             </div>
@@ -751,7 +761,7 @@ info@goran.in | https://goran.in</textarea>
                     <div class="invoice-header">
                         <div class="invoice-logo-area">
                             <h2 id="p-company-name">GORAN AI</h2>
-                            <p id="p-company-details" style="white-space: pre-line;">info@goran.in | https://goran.in</p>
+                            <p id="p-company-details" style="white-space: pre-line;">official.goranai@gmail.com | https://goran.in</p>
                         </div>
                         <div class="invoice-title-area">
                             <h3>INVOICE</h3>
@@ -777,8 +787,8 @@ info@goran.in | https://goran.in</textarea>
                             <h4>Payment Method</h4>
                             <div class="name">Bank Transfer / UPI</div>
                             <div class="details" id="p-payment-summary">
-                                Bank Name: HDFC Bank
-                                UPI ID: goranai@upi
+                                Bank Name: State Bank of India
+                                UPI ID: ranjanashish9992@ybl
                             </div>
                         </div>
                     </div>
@@ -805,20 +815,20 @@ info@goran.in | https://goran.in</textarea>
                         <h5>Bank / UPI Transfer Details</h5>
                         <div class="bank-details-grid">
                             <span class="lbl">Bank Name:</span>
-                            <span class="value" id="p-bank-name">HDFC Bank</span>
+                            <span class="value" id="p-bank-name">State Bank of India</span>
                             
                             <span class="lbl">Account No:</span>
-                            <span class="value" id="p-bank-ac">50200012345678</span>
+                            <span class="value" id="p-bank-ac">42002389558</span>
                             
                             <span class="lbl">IFSC Code:</span>
-                            <span class="value" id="p-bank-ifsc">HDFC0001234</span>
+                            <span class="value" id="p-bank-ifsc">SBIN0002911</span>
                             
                             <span class="lbl">UPI ID:</span>
-                            <span class="value" id="p-bank-upi">goranai@upi</span>
+                            <span class="value" id="p-bank-upi">ranjanashish9992@ybl</span>
                         </div>
                     </div>
                     <div class="footer-note">
-                        Thank you for your business. Please reach out to billing@goran.in if you have any questions.
+                        Thank you for your business. Please reach out to official.goranai@gmail.com if you have any questions.
                     </div>
                 </div>
             </div>

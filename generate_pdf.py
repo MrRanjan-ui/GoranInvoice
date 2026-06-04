@@ -33,7 +33,7 @@ class NumberedCanvas(canvas.Canvas):
         self.line(40, 50, 555, 50)
         
         # Draw footer text
-        self.drawString(40, 35, "GORAN AI  |  info@goran.in  |  https://goran.in")
+        self.drawString(40, 35, "GORAN AI  |  official.goranai@gmail.com  |  https://goran.in")
         self.drawRightString(555, 35, f"Page {self._pageNumber} of {page_count}")
         self.restoreState()
 
@@ -182,7 +182,7 @@ def create_invoice(filename, details):
     # --- Header Table ---
     # Left: Brand, Right: Invoice Title & Meta
     brand_p = Paragraph("GORAN AI", styles['HeaderBrand'])
-    brand_sub_p = Paragraph("Advanced AI Agents & Web Solutions<br/>Email: billing@goran.in<br/>Website: https://goran.in", styles['HeaderBrandSub'])
+    brand_sub_p = Paragraph("Advanced AI Agents & Web Solutions<br/>Email: official.goranai@gmail.com<br/>Website: https://goran.in", styles['HeaderBrandSub'])
     
     brand_flow = [brand_p, Spacer(1, 4), brand_sub_p]
     
@@ -320,10 +320,10 @@ if __name__ == "__main__":
         'client_name': 'Anaaj AI',
         'project_name': 'Anaaj AI Development',
         'client_address': 'Project Development Contract\nPhase 2 Deliverables',
-        'bank_name': 'HDFC Bank',
-        'bank_account_no': '50200012345678',
-        'bank_ifsc': 'HDFC0001234',
-        'upi_id': 'goranai@upi',
+        'bank_name': 'State Bank of India',
+        'bank_account_no': '42002389558',
+        'bank_ifsc': 'SBIN0002911',
+        'upi_id': 'ranjanashish9992@ybl',
         'items': [
             {
                 'description': 'Anaaj AI Development - 2nd Installment',
