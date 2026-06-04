@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GORAN AI - Interactive Invoice Generator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            flex: 1;
+            height: calc(100vh - 72px);
+            overflow: hidden;
+        }
+
+        /* Left Controls Panel */
+        .controls-panel {
+            background-color: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        .btn-danger:hover {
+            background-color: #fecaca;
+        }
+
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .item-row-input {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Right Preview Panel */
+        .preview-panel {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #e2e8f0;
+        }
+
+        /* A4 Page Styling */
+        .invoice-paper {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            background-color: white;
+            box-shadow: var(--shadow-lg);
+            box-sizing: border-box;
+            position: relative;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            font-size: 13px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Invoice Content Styles */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+        }
+
+        .invoice-logo-area h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .invoice-logo-area p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .invoice-title-area {
+            text-align: right;
+        }
+
+        .invoice-title-area h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-meta-info {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 0.25rem 1rem;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .invoice-meta-info .label {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .invoice-meta-info .val {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .invoice-parties {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        .party-box h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .party-box .name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .party-box .details {
+            color: var(--text-muted);
+            line-height: 1.4;
+            font-size: 0.85rem;
+            white-space: pre-line;
+        }
+
+        .invoice-table-container {
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .invoice-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .invoice-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .invoice-table td.amount {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .invoice-table th.amount {
+            text-align: right;
+        }
+
+        .invoice-totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .totals-box {
+            width: 250px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .totals-box .label {
+            text-align: right;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .totals-box .val {
+            text-align: right;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .totals-box .grand-total-label {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #0f172a;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .totals-box .grand-total-val {
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--accent);
+            border-top: 2px solid #e2e8f0;
+            padding-top: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .invoice-footer-section {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: auto;
+        }
+
+        .bank-details {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bank-details h5 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #3b4252;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        .bank-details-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.25rem 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .bank-details-grid .lbl {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .bank-details-grid .value {
+            color: #0f172a;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* WhatsApp Box style */
+        .whatsapp-box {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .whatsapp-box textarea {
+            width: 100%;
+            height: 120px;
+            padding: 0.5rem;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+            background: white;
+            font-family: inherit;
+            font-size: 0.8rem;
+            resize: vertical;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabs styling */
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Tracking table styling */
+        .sheet-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .sheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .sheet-table th {
+            background: #f1f5f9;
+            position: sticky;
+            top: 0;
+            padding: 0.5rem;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sheet-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.125rem 0.35rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+        }
+
+        .badge-paid {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Print Media CSS styling */
+        @media print {
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+
+            .controls-panel, header, .preview-panel {
+                display: none !important;
+            }
+
+            .app-container {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            .preview-panel {
+                padding: 0 !important;
+                background-color: transparent !important;
+            }
+
+            .invoice-paper {
+                box-shadow: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">G</div>
+            <div class="logo-text">
+                <h1>GORAN AI</h1>
+                <p>Invoice Desk</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="window.print()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Print / Save PDF
+            </button>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('invoice-fields')">Invoice Details</button>
+                <button class="tab-btn" onclick="switchTab('whatsapp-msg')">WhatsApp Send</button>
+                <button class="tab-btn" onclick="switchTab('history-tracker')">Sheet Ledger</button>
+            </div>
+
+            <!-- TAB: INVOICE FIELDS -->
+            <div id="tab-invoice-fields" class="tab-content">
+                <div class="section-title">Invoice Meta</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inv-no">Invoice Number</label>
+                        <input type="text" id="inv-no" class="form-control" value="INV-001" oninput="updateInvoice()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inv-date">Invoice Date</label>
+                        <input type="date" id="inv-date" class="form-control" onchange="updateInvoice()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inv-due">Payment Due Date</label>
+                        <input type="date" id="inv-due" class="form-control" onchange="updateInvoice()">
+                    </div>
+                    <div class="form-group">
+                        <label for="invoice-type">Template Preset</label>
+                        <select id="invoice-type" class="form-control" onchange="applyPreset()">
+                            <option value="development">Development Installment</option>
+                            <option value="maintenance">Monthly Maintenance</option>
+                            <option value="custom">Custom Invoice</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Client Details</div>
+                <div class="form-group">
+                    <label for="client-name">Client Name / Business Name</label>
+                    <input type="text" id="client-name" class="form-control" value="Anaaj AI" oninput="updateInvoice()">
+                </div>
+                <div class="form-group">
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" class="form-control" value="Anaaj AI Development" oninput="updateInvoice()">
+                </div>
+                <div class="form-group">
+                    <label for="client-details">Client Address / Tax Details (Optional)</label>
+                    <textarea id="client-details" class="form-control" style="height: 60px;" oninput="updateInvoice()"></textarea>
+                </div>
+
+                <div class="section-title">
+                    <span>Items (Line items)</span>
+                    <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="addItemRow()">+ Add</button>
+                </div>
+                <div class="items-list" id="items-list-container">
+                    <!-- Dynamic Rows Go Here -->
+                </div>
+
+                <div class="section-title" style="margin-top: 1.5rem;">Payment Info (GORAN AI)</div>
+                <div class="form-group">
+                    <label for="company-details">Company Header Details</label>
+                    <textarea id="company-details" class="form-control" style="height: 60px;" oninput="updateInvoice()">GORAN AI
+info@goran.in | https://goran.in</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="bank-name">Bank Name</label>
+                    <input type="text" id="bank-name" class="form-control" value="HDFC Bank" oninput="updateInvoice()">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bank-ac">Account Number</label>
+                        <input type="text" id="bank-ac" class="form-control" value="50200012345678" oninput="updateInvoice()">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank-ifsc">IFSC Code</label>
+                        <input type="text" id="bank-ifsc" class="form-control" value="HDFC0001234" oninput="updateInvoice()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bank-upi">UPI Address</label>
+                    <input type="text" id="bank-upi" class="form-control" value="goranai@upi" oninput="updateInvoice()">
+                </div>
+                <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="saveInvoiceToLedger()">Save Invoice to Ledger</button>
+            </div>
+
+            <!-- TAB: WHATSAPP MESSAGE -->
+            <div id="tab-whatsapp-msg" class="tab-content" style="display: none;">
+                <div class="section-title">Send WhatsApp Message</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    This text updates dynamically based on your invoice details. You can customize the templates below.
+                </p>
+                <div class="form-group">
+                    <label for="wa-template-type">WhatsApp Flow</label>
+                    <select id="wa-template-type" class="form-control" onchange="updateWhatsAppMessage()">
+                        <option value="development">Development Installment Message</option>
+                        <option value="maintenance">Maintenance Message</option>
+                    </select>
+                </div>
+                <div class="whatsapp-box">
+                    <textarea id="whatsapp-textarea"></textarea>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="copyWhatsAppMessage()">Copy Message</button>
+                        <button class="btn btn-success" id="btn-send-wa" onclick="sendWhatsAppDirect()">Open WhatsApp</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: HISTORY TRACKER -->
+            <div id="tab-history-tracker" class="tab-content" style="display: none;">
+                <div class="section-title">Invoice Sheet Ledger</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                    This tracks your history locally on your computer, keeping separate payments organized.
+                </p>
+                <div class="sheet-container">
+                    <table class="sheet-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice No</th>
+                                <th>Client</th>
+                                <th>Purpose</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-body">
+                            <!-- ledger logs -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 1rem; display: flex; justify-content: space-between; gap: 0.5rem;">
+                    <button class="btn btn-danger" onclick="clearLedger()">Clear All Records</button>
+                    <button class="btn btn-secondary" onclick="exportLedgerToCSV()">Export to CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <div class="invoice-paper" id="invoice-printable">
+                <div>
+                    <!-- Header -->
+                    <div class="invoice-header">
+                        <div class="invoice-logo-area">
+                            <h2 id="p-company-name">GORAN AI</h2>
+                            <p id="p-company-details" style="white-space: pre-line;">info@goran.in | https://goran.in</p>
+                        </div>
+                        <div class="invoice-title-area">
+                            <h3>INVOICE</h3>
+                            <div class="invoice-meta-info">
+                                <span class="label">Invoice No:</span>
+                                <span class="val" id="p-inv-no">INV-001</span>
+                                <span class="label">Date:</span>
+                                <span class="val" id="p-inv-date">04 Jun 2026</span>
+                                <span class="label">Due Date:</span>
+                                <span class="val" id="p-inv-due">18 Jun 2026</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Client / Party Details -->
+                    <div class="invoice-parties">
+                        <div class="party-box">
+                            <h4>Billed To</h4>
+                            <div class="name" id="p-client-name">Anaaj AI</div>
+                            <div class="details" id="p-client-details">Project: Anaaj AI Development</div>
+                        </div>
+                        <div class="party-box">
+                            <h4>Payment Method</h4>
+                            <div class="name">Bank Transfer / UPI</div>
+                            <div class="details" id="p-payment-summary">
+                                Bank Name: HDFC Bank
+                                UPI ID: goranai@upi
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Items Table -->
+                    <div class="invoice-table-container">
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70%">Description</th>
+                                    <th class="amount" style="width: 30%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="p-table-body">
+                                <!-- Dynamic items preview -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer Section (Fixed to Bottom of A4) -->
+                <div class="invoice-footer-section">
+                    <div class="bank-details">
+                        <h5>Bank / UPI Transfer Details</h5>
+                        <div class="bank-details-grid">
+                            <span class="lbl">Bank Name:</span>
+                            <span class="value" id="p-bank-name">HDFC Bank</span>
+                            
+                            <span class="lbl">Account No:</span>
+                            <span class="value" id="p-bank-ac">50200012345678</span>
+                            
+                            <span class="lbl">IFSC Code:</span>
+                            <span class="value" id="p-bank-ifsc">HDFC0001234</span>
+                            
+                            <span class="lbl">UPI ID:</span>
+                            <span class="value" id="p-bank-upi">goranai@upi</span>
+                        </div>
+                    </div>
+                    <div class="footer-note">
+                        Thank you for your business. Please reach out to billing@goran.in if you have any questions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set Default Dates to Today and 14-days ahead
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        document.getElementById('inv-date').value = formattedToday;
+
+        const dueDate = new Date();
+        dueDate.setDate(today.getDate() + 14);
+        document.getElementById('inv-due').value = dueDate.toISOString().split('T')[0];
+
+        // Default item list
+        let invoiceItems = [
+            { description: 'Anaaj AI Development - 2nd Installment', amount: 25000 }
+        ];
+
+        // Default Ledger entries (seeded from example)
+        let ledger = JSON.parse(localStorage.getItem('goran_ledger')) || [
+            { invoiceNo: 'INV-001', client: 'Anaaj AI', purpose: 'Advance Payment', amount: 25000, status: 'Paid' },
+            { invoiceNo: 'INV-002', client: 'Anaaj AI', purpose: '2nd Installment', amount: 25000, status: 'Paid' },
+            { invoiceNo: 'INV-003', client: 'Anaaj AI', purpose: 'Final Installment', amount: 25000, status: 'Pending' },
+            { invoiceNo: 'INV-004', client: 'Anaaj AI', purpose: 'July Maintenance', amount: 5000, status: 'Pending' }
+        ];
+
+        function init() {
+            renderItemInputs();
+            updateInvoice();
+            renderLedger();
+        }
+
+        // Active Tabs control
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            
+            // Highlight button
+            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).style.display = 'block';
+        }
+
+        // Preset Templates Apply Function
+        function applyPreset() {
+            const type = document.getElementById('invoice-type').value;
+            const clientName = document.getElementById('client-name').value || 'Client';
+            
+            if (type === 'development') {
+                document.getElementById('project-name').value = clientName + " Development";
+                invoiceItems = [
+                    { description: clientName + ' AI Development - 2nd Installment', amount: 25000 }
+                ];
+                document.getElementById('wa-template-type').value = 'development';
+            } else if (type === 'maintenance') {
+                document.getElementById('project-name').value = clientName + " Maintenance";
+                invoiceItems = [
+                    { description: 'Monthly Maintenance Invoice for ' + clientName + ' - Period of June 2026', amount: 5000 }
+                ];
+                document.getElementById('wa-template-type').value = 'maintenance';
+            } else {
+                // Keep current items but allow editing
+            }
+            renderItemInputs();
+            updateInvoice();
+        }
+
+        // Render Input fields for items
+        function renderItemInputs() {
+            const container = document.getElementById('items-list-container');
+            container.innerHTML = '';
+            invoiceItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'item-row-input';
+                row.innerHTML = `
+                    <input type="text" class="form-control" placeholder="Description" value="${item.description}" oninput="updateItemField(${index}, 'description', this.value)">
+                    <input type="number" class="form-control" placeholder="Amount (₹)" value="${item.amount}" oninput="updateItemField(${index}, 'amount', this.value)">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="removeItemRow(${index})">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addItemRow() {
+            invoiceItems.push({ description: '', amount: 0 });
+            renderItemInputs();
+            updateInvoice();
+        }
+
+        function removeItemRow(index) {
+            if (invoiceItems.length > 1) {
+                invoiceItems.splice(index, 1);
+                renderItemInputs();
+                updateInvoice();
+            } else {
+                alert('An invoice must have at least one line item.');
+            }
+        }
+
+        function updateItemField(index, key, value) {
+            if (key === 'amount') {
+                invoiceItems[index][key] = parseFloat(value) || 0;
+            } else {
+                invoiceItems[index][key] = value;
+            }
+            updateInvoice();
+        }
+
+        // Sync inputs with print preview
+        function updateInvoice() {
+            // Meta Fields
+            const invNo = document.getElementById('inv-no').value;
+            const invDate = new Date(document.getElementById('inv-date').value);
+            const invDueDate = new Date(document.getElementById('inv-due').value);
+            
+            // Format dates cleanly
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            const formattedDate = isNaN(invDate.getTime()) ? '' : invDate.toLocaleDateString('en-IN', options);
+            const formattedDueDate = isNaN(invDueDate.getTime()) ? '' : invDueDate.toLocaleDateString('en-IN', options);
+
+            document.getElementById('p-inv-no').innerText = invNo;
+            document.getElementById('p-inv-date').innerText = formattedDate;
+            document.getElementById('p-inv-due').innerText = formattedDueDate;
+
+            // Clients
+            const clientName = document.getElementById('client-name').value;
+            const projectName = document.getElementById('project-name').value;
+            const clientExtra = document.getElementById('client-details').value;
+
+            document.getElementById('p-client-name').innerText = clientName;
+            document.getElementById('p-client-details').innerHTML = `<strong>Project:</strong> ${projectName}<br>${clientExtra.replace(/\n/g, '<br>')}`;
+
+            // Company Info
+            const companyHeader = document.getElementById('company-details').value;
+            document.getElementById('p-company-details').innerText = companyHeader;
+
+            // Payment Details
+            const bankName = document.getElementById('bank-name').value;
+            const bankAc = document.getElementById('bank-ac').value;
+            const bankIfsc = document.getElementById('bank-ifsc').value;
+            const bankUpi = document.getElementById('bank-upi').value;
+
+            document.getElementById('p-bank-name').innerText = bankName;
+            document.getElementById('p-bank-ac').innerText = bankAc;
+            document.getElementById('p-bank-ifsc').innerText = bankIfsc;
+            document.getElementById('p-bank-upi').innerText = bankUpi;
+
+            document.getElementById('p-payment-summary').innerHTML = `
+                Bank Name: ${bankName}<br>
+                A/C: ${bankAc}<br>
+                UPI: ${bankUpi}
+            `;
+
+            // Render Table Preview
+            const tableBody = document.getElementById('p-table-body');
+            tableBody.innerHTML = '';
+            
+            let totalAmount = 0;
+            invoiceItems.forEach(item => {
+                totalAmount += item.amount;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.description || 'No Description'}</td>
+                    <td class="amount">₹${item.amount.toLocaleString('en-IN')}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Append Total row
+            const trTotal = document.createElement('tr');
+            trTotal.style.borderTop = '2px solid #e2e8f0';
+            trTotal.innerHTML = `
+                <td style="font-weight: 700; text-align: right;">Total</td>
+                <td class="amount" style="font-weight: 700; color: var(--accent);">₹${totalAmount.toLocaleString('en-IN')}</td>
+            `;
+            tableBody.appendChild(trTotal);
+
+            // Update WhatsApp template text box
+            updateWhatsAppMessage();
+        }
+
+        // WhatsApp formatting logic
+        function updateWhatsAppMessage() {
+            const templateType = document.getElementById('wa-template-type').value;
+            const clientName = document.getElementById('client-name').value || 'Client';
+            const projectName = document.getElementById('project-name').value || 'Project';
+            
+            // Compute total amount
+            let totalAmount = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
+            const formattedTotal = '₹' + totalAmount.toLocaleString('en-IN');
+            
+            let text = '';
+            
+            if (templateType === 'development') {
+                // Find a descriptor (e.g. 2nd Installment)
+                const desc = invoiceItems[0]?.description || 'AI Development Installment';
+                text = `Hello Sir,
+
+Please find attached the invoice for the payment of "${desc}".
+
+Amount: ${formattedTotal}
+
+Kindly process the payment at your convenience. Please let me know once the payment is completed so that I can update my records.
+
+Thank you.`;
+            } else {
+                // Maintenance
+                const date = new Date(document.getElementById('inv-date').value);
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const period = monthNames[date.getMonth()] + " " + date.getFullYear();
+
+                text = `Hello Sir,
+
+Please find attached the monthly maintenance invoice for ${clientName} for the period of ${period}.
+
+Maintenance Fee: ${formattedTotal}
+
+This covers routine maintenance, monitoring, bug fixes, and technical support as per our agreement.
+
+Kindly let me know once the payment has been processed.
+
+Thank you.`;
+            }
+
+            document.getElementById('whatsapp-textarea').value = text;
+        }
+
+        function copyWhatsAppMessage() {
+            const textarea = document.getElementById('whatsapp-textarea');
+            textarea.select();
+            document.execCommand('copy');
+            alert('WhatsApp message copied to clipboard!');
+        }
+
+        function sendWhatsAppDirect() {
+            const text = encodeURIComponent(document.getElementById('whatsapp-textarea').value);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        // LEDGER SYSTEM
+        function renderLedger() {
+            localStorage.setItem('goran_ledger', JSON.stringify(ledger));
+            const tbody = document.getElementById('ledger-body');
+            tbody.innerHTML = '';
+
+            ledger.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                const statusBadge = item.status.toLowerCase() === 'paid' 
+                    ? `<span class="badge badge-paid" onclick="toggleStatus(${index})">${item.status}</span>`
+                    : `<span class="badge badge-pending" onclick="toggleStatus(${index})">${item.status}</span>`;
+
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:var(--accent);">${item.invoiceNo}</td>
+                    <td>${item.client}</td>
+                    <td>${item.purpose}</td>
+                    <td style="font-weight:500;">₹${item.amount.toLocaleString('en-IN')}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="deleteLedgerItem(${index})">Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleStatus(index) {
+            ledger[index].status = ledger[index].status === 'Paid' ? 'Pending' : 'Paid';
+            renderLedger();
+        }
+
+        function deleteLedgerItem(index) {
+            if (confirm('Delete this ledger record?')) {
+                ledger.splice(index, 1);
+                renderLedger();
+            }
+        }
+
+        function clearLedger() {
+            if (confirm('Are you sure you want to clear all spreadsheet ledger records?')) {
+                ledger = [];
+                renderLedger();
+            }
+        }
+
+        function saveInvoiceToLedger() {
+            const invNo = document.getElementById('inv-no').value;
+            const clientName = document.getElementById('client-name').value;
+            
+            // Compute total amount
+            let totalAmount = invoiceItems.reduce((sum, item) => sum + item.amount, 0);
+            
+            // Check if Invoice No already exists
+            const existsIndex = ledger.findIndex(x => x.invoiceNo === invNo);
+            
+            const itemPurpose = invoiceItems[0]?.description || 'Project Invoice';
+
+            const record = {
+                invoiceNo: invNo,
+                client: clientName,
+                purpose: itemPurpose,
+                amount: totalAmount,
+                status: 'Pending' // default status for new invoices
+            };
+
+            if (existsIndex > -1) {
+                if (confirm(`Invoice ${invNo} already exists in the ledger. Do you want to update it?`)) {
+                    ledger[existsIndex] = record;
+                } else {
+                    return;
+                }
+            } else {
+                ledger.push(record);
+            }
+
+            renderLedger();
+            alert(`Invoice ${invNo} successfully recorded in your Sheet Ledger!`);
+            
+            // Switch tab to Ledger to show the result
+            switchTab('history-tracker');
+        }
+
+        function exportLedgerToCSV() {
+            let csv = 'Invoice No,Client,Purpose,Amount,Status\n';
+            ledger.forEach(item => {
+                csv += `"${item.invoiceNo}","${item.client}","${item.purpose}",${item.amount},"${item.status}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `goran_invoice_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Run
+        init();
+    </script>
+</body>
+</html>
